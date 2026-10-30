@@ -17,6 +17,15 @@ test('Independent multi-pointer movement, smash edge, cancel and pause',()=>{
  keys[1].handlers.pointercancel(event(1));assert.equal(window.NanoTouch.poll(),4|32);
  keys[2].handlers.pointerup(event(2));keys[5].handlers.lostpointercapture(event(4));assert.equal(window.NanoTouch.poll(),0);
  keys[0].handlers.pointerdown(event(5));window.NanoTouch.pause();assert.equal(window.NanoTouch.poll(),4<<10);assert.equal(window.NanoTouch.poll(),0);
+ keys[0].closest=()=>({getBoundingClientRect:()=>({left:0,top:0,width:150,height:150})});
+ keys[0].handlers.pointerdown(event(6));
+ keys[0].handlers.pointermove({...event(6),clientX:140,clientY:10});
+ assert.equal(window.NanoTouch.poll(),2|4,'sliding the cross supports diagonal movement and jump');
+ keys[0].handlers.pointermove({...event(6),clientX:75,clientY:75});
+ assert.equal(window.NanoTouch.poll(),0,'cross center releases the direction');
+ keys[0].handlers.pointermove({...event(6),clientX:400,clientY:75});
+ assert.equal(window.NanoTouch.poll(),0,'dragging off the cross does not stick');
+ keys[0].handlers.pointerup(event(6));
  window.NanoTouch.mode(false);assert.equal(host.dataset.mode,'double');
  commands[2].handlers.click();assert.equal(window.NanoTouch.poll(),3<<10);
  window.NanoTouch.mode(true);assert.equal(host.dataset.mode,'single');
