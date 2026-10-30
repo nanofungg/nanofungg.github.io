@@ -21,3 +21,7 @@ Three playable cabinets share the simulated wallet. New games keep independent s
 
 Guest session: sessionStorage grants five coins per tab session. Refresh preserves the count. Guest coins are spent before the existing email balance. Cabinet entry is free even at zero; the next actual start opens the wallet when both balances are empty. Existing daily and simulated-ad rewards remain available after email entry.
 
+
+## Languages
+Auto-detects ordered browser languages and supports zh-CN, en, ja, es-MX and ko. Manual preference is browser-local and persists. No geolocation or external translation service is used. Translation source: dist/locales.tsv. Run node build-i18n.cjs to regenerate dist/i18n.js and docs/i18n.js. DOM text and accessibility labels are localized, including same-origin game frames; Godot's canvas-rendered classic English HUD is unchanged. New dynamic phrases must be added to the catalog.
+
