@@ -2,7 +2,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const STORAGE = 'nanofun.arcade.demo.v1';
-  const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=p2-fix-1',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=sound1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=sound1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
+  const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=audio1',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=sound1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=sound1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
   let selectedGame = 'volleyball';
   let active = null, toastTimer, storageOK = true;
   function readStore() {
@@ -82,6 +82,7 @@
   $('play-button').addEventListener('click',()=>openCabinet('volleyball'));
   $('play-2048').addEventListener('click',()=>openCabinet('2048'));
   $('play-snake').addEventListener('click',()=>openCabinet('snake'));
+  $('cabinet-dialog').addEventListener('pointerdown',()=>{if(selectedGame==='volleyball')$('game-frame-host').firstChild?.contentWindow?.NanoPikaAudio?.unlock();},{capture:true,passive:true});
   $('exit-game').addEventListener('click',()=>$('cabinet-dialog').close());
   $('cabinet-dialog').addEventListener('close',()=>{window.NanoTouch?.reset();$('game-frame-host').replaceChildren();$('game-status').textContent='选择模式后投币开赛。';});
   // Synchronous same-origin bridge for this local demo, not a production security boundary.

@@ -94,7 +94,7 @@ body {
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 
 	<script>for(const type of ["gesturestart","gesturechange","gestureend","dblclick","contextmenu"]){document.addEventListener(type,e=>e.preventDefault(),{passive:false});}document.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});</script></head>
-	<body>
+	<body><button id="audio-status" onclick="window.NanoPikaAudio?.unlock()" style="position:fixed;right:4px;top:4px;z-index:10;font:10px Arial;color:white;background:#101826b0;border:1px solid #ffffff50;border-radius:4px;padding:4px;touch-action:manipulation">点击游戏启用声音</button>
 		<canvas id="canvas">
 			Your browser does not support the canvas tag.
 		</canvas>
@@ -109,9 +109,9 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="index.js"></script>
+		<script src="audio.js?v=1"></script><script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","mainPack":"p2-fix-v1.pck","experimentalVK":false,"fileSizes":{"p2-fix-v1.pck":2133568,"index.wasm":43682606},"focusCanvas":true,"gdextensionLibs":[]};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","mainPack":"audio-v1.pck","experimentalVK":false,"fileSizes":{"audio-v1.pck":2133824,"index.wasm":43682606},"focusCanvas":true,"gdextensionLibs":[]};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
