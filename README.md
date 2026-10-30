@@ -23,5 +23,5 @@ Guest session: sessionStorage grants five coins per tab session. Refresh preserv
 
 
 ## Languages
-Auto-detects ordered browser languages and supports zh-CN, en, ja, es-MX and ko. Manual preference is browser-local and persists. No geolocation or external translation service is used. Translation source: dist/locales.tsv. Run node build-i18n.cjs to regenerate dist/i18n.js and docs/i18n.js. DOM text and accessibility labels are localized, including same-origin game frames; Godot's canvas-rendered classic English HUD is unchanged. New dynamic phrases must be added to the catalog.
+Auto-detects ordered browser languages and supports zh-CN, en, ja, es-MX and ko. Manual preference is browser-local and persists. No geolocation or external translation service is used. Translation source: dist/locales.tsv. Run node build-i18n.cjs to regenerate dist/i18n.js and docs/i18n.js. DOM text and accessibility labels are localized, including same-origin game frames; Godot's canvas HUD now polls the same selected language without restarting the match. New dynamic phrases must be added to the catalog.
 
