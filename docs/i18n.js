@@ -18,7 +18,7 @@ const ROWS=[["游戏厅","Arcade","ゲーム一覧","Arcade","게임장"],["怎�
   function frameReady(frame){try{const doc=frame.contentDocument;if(!doc?.body)return;if(frame.contentWindow.NanoI18n){frame.contentWindow.NanoI18n.set(lang,false);return;}if(doc.querySelector('[data-nanofun-i18n]'))return;const script=doc.createElement('script');script.src=scriptURL;script.dataset.nanofunI18n='true';doc.head.append(script);}catch{}}
   function paint(){
     observer?.disconnect();document.documentElement.lang=lang;
-    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
+    const walker=document.createTreeWalker(document.documentElement,NodeFilter.SHOW_TEXT);let node;
     while((node=walker.nextNode())){if(node.parentElement?.closest('script,style,select,[translate="no"]'))continue;const old=textMemory.get(node);const source=old&&node.nodeValue===old.output?old.source:node.nodeValue;const output=translate(source,lang);if(output!==node.nodeValue)node.nodeValue=output;textMemory.set(node,{source,output});}
     document.querySelectorAll('[aria-label],[alt],[title],[placeholder]').forEach(el=>{if(el.closest('select,[translate="no"]'))return;const saved=attributeMemory.get(el)||{};for(const name of ['aria-label','alt','title','placeholder']){const value=el.getAttribute(name);if(value===null)continue;const old=saved[name],source=old&&value===old.output?old.source:value,output=translate(source,lang);if(output!==value)el.setAttribute(name,output);saved[name]={source,output};}attributeMemory.set(el,saved);});
     document.querySelectorAll('iframe').forEach(frame=>{if(!frames.has(frame)){frames.add(frame);frame.addEventListener('load',()=>frameReady(frame));frameReady(frame);}});
