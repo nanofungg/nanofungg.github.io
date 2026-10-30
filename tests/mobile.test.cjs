@@ -1,0 +1,23 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const vm=require('node:vm');
+const fs=require('node:fs');
+test('Independent multi-pointer movement, smash edge, cancel and pause',()=>{
+ const make=(dataset={})=>({dataset,handlers:{},classList:{toggle(){},remove(){},add(){},contains(){return true;}},addEventListener(k,f){this.handlers[k]=f;},setPointerCapture(){},setAttribute(){}});
+ const keys=[1,2,4,8,16,32,64,128,256,512].map(bit=>make({bit}));
+ const commands=[1,2,3].map(command=>make({command}));
+ const host=make();host.querySelectorAll=s=>s==='[data-bit]'?keys:s==='[data-command]'?commands:[];
+ const nodes={'mobile-controls':host,'cabinet-dialog':make(),'touch-toggle':make(),'touch-help':make()};
+ const window=make(),document={getElementById:id=>nodes[id],addEventListener(){}};
+ vm.runInNewContext(fs.readFileSync('dist/mobile.js','utf8'),{window,document,matchMedia:()=>({matches:true}),navigator:{maxTouchPoints:5}});
+ const event=pointerId=>({pointerId,preventDefault(){}});
+ keys[1].handlers.pointerdown(event(1));keys[2].handlers.pointerdown(event(2));keys[4].handlers.pointerdown(event(3));keys[5].handlers.pointerdown(event(4));
+ assert.equal(window.NanoTouch.poll(),2|4|16|32);
+ assert.equal(window.NanoTouch.poll(),2|4|32,'smash is a single edge, movement stays held');
+ keys[1].handlers.pointercancel(event(1));assert.equal(window.NanoTouch.poll(),4|32);
+ keys[2].handlers.pointerup(event(2));keys[5].handlers.lostpointercapture(event(4));assert.equal(window.NanoTouch.poll(),0);
+ keys[0].handlers.pointerdown(event(5));window.NanoTouch.pause();assert.equal(window.NanoTouch.poll(),4<<10);assert.equal(window.NanoTouch.poll(),0);
+ window.NanoTouch.mode(false);assert.equal(host.dataset.mode,'double');
+ commands[2].handlers.click();assert.equal(window.NanoTouch.poll(),3<<10);
+ window.NanoTouch.mode(true);assert.equal(host.dataset.mode,'single');
+});

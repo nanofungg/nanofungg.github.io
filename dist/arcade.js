@@ -22,7 +22,7 @@
     render(); return true;
   }
   function toast(message) { $('toast').textContent=message; $('toast').classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3500); }
-  function openWallet(message='') { render(); $('wallet-message').textContent=message; if(!$('wallet-dialog').open) $('wallet-dialog').showModal(); }
+  function openWallet(message='') { window.NanoTouch?.pause(); render(); $('wallet-message').textContent=message; if(!$('wallet-dialog').open) $('wallet-dialog').showModal(); }
   function dailyClaim() {
     if(!account()) { openWallet(); return; }
     if(transaction(10,'每日领取',a=>a.day!==today(),{day:today()})) { $('wallet-message').textContent='今日 10 枚模拟币已到账，开玩吧！'; toast('每日奖励 ＋10 模拟币'); }
@@ -64,12 +64,12 @@
   function openCabinet() {
     if(!account()){openWallet('先建立演示身份，领取每日 10 币。然后进入机台。');return;}
     if(account().coins<1){openWallet('模拟币用完了。领取可用奖励后再来一局。');return;}
-    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/pikachu-volleyball/?v=arcade-3';frame.title='皮卡丘排球 — Godot 街机演示';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
+    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/pikachu-volleyball/?v=mobile-1';frame.title='皮卡丘排球 — Godot 街机演示';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
     $('game-status').textContent='选择单人或双人模式时投 1 枚模拟币。';$('cabinet-dialog').showModal();render();
   }
   $('play-button').addEventListener('click',openCabinet);
   $('exit-game').addEventListener('click',()=>$('cabinet-dialog').close());
-  $('cabinet-dialog').addEventListener('close',()=>{$('game-frame-host').replaceChildren();$('game-status').textContent='选择模式后投币开赛。';});
+  $('cabinet-dialog').addEventListener('close',()=>{window.NanoTouch?.reset();$('game-frame-host').replaceChildren();$('game-status').textContent='选择模式后投币开赛。';});
   // Synchronous same-origin bridge for this local demo, not a production security boundary.
   window.NanoArcade=Object.freeze({requestMatch(){
     if(!$('cabinet-dialog').open||!account()){openWallet('请先进入演示身份。');return false;}

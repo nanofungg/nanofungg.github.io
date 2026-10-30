@@ -1,4 +1,14 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
-const root = new URL('./dist/', import.meta.url);
-http.createServer(async (req,res)=>{try {const pathname=new URL(req.url,'http://localhost').pathname; if(pathname!=='/' && pathname!=='/index.html'){res.writeHead(404);res.end('Not found');return;} res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('index.html',root)));}catch{res.writeHead(500);res.end('Preview unavailable');}}).listen(4173,'127.0.0.1',()=>console.log('Local: http://127.0.0.1:4173'));
+import {resolve,extname,sep} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=fileURLToPath(new URL('./docs/',import.meta.url));
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.wasm':'application/wasm','.png':'image/png'};
+http.createServer(async(req,res)=>{try{
+ let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+ if(pathname.endsWith('/'))pathname+='index.html';
+ const path=resolve(root,'.'+pathname);
+ if(!path.startsWith(root.endsWith(sep)?root:root+sep)){res.writeHead(403);res.end();return;}
+ res.setHeader('Content-Type',types[extname(path)]||'application/octet-stream');
+ res.setHeader('Cache-Control','no-store');res.end(await readFile(path));
+}catch{res.writeHead(404);res.end('Not found');}}).listen(4173,'127.0.0.1',()=>console.log('Local: http://127.0.0.1:4173'));
