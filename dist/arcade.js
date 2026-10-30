@@ -2,6 +2,8 @@
 (() => {
   const $ = id => document.getElementById(id);
   const STORAGE = 'nanofun.arcade.demo.v1';
+  const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=p2-fix-1',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
+  let selectedGame = 'volleyball';
   let active = null, toastTimer, storageOK = true;
   function readStore() {
     try { const value=JSON.parse(localStorage.getItem(STORAGE)||'{"accounts":{}}'); return value && value.accounts && typeof value.accounts==='object' ? value : {accounts:{}}; }
@@ -22,7 +24,7 @@
     render(); return true;
   }
   function toast(message) { $('toast').textContent=message; $('toast').classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3500); }
-  function openWallet(message='') { window.NanoTouch?.pause(); render(); $('wallet-message').textContent=message; if(!$('wallet-dialog').open) $('wallet-dialog').showModal(); }
+  function openWallet(message='') { window.NanoTouch?.pause(); $('game-frame-host').firstChild?.contentWindow?.postMessage('nanofun:pause',location.origin); render(); $('wallet-message').textContent=message; if(!$('wallet-dialog').open) $('wallet-dialog').showModal(); }
   function dailyClaim() {
     if(!account()) { openWallet(); return; }
     if(transaction(10,'每日领取',a=>a.day!==today(),{day:today()})) { $('wallet-message').textContent='今日 10 枚模拟币已到账，开玩吧！'; toast('每日奖励 ＋10 模拟币'); }
@@ -69,21 +71,25 @@
     games.focus({preventScroll:true});
     games.scrollIntoView({block:'start'});
   });
-  function openCabinet() {
+  function openCabinet(gameId = 'volleyball') {
+    selectedGame = games[gameId] ? gameId : 'volleyball';
+    const game=games[selectedGame];
     if(!account()){openWallet('先建立演示身份，领取每日 10 币。然后进入机台。');return;}
     if(account().coins<1){openWallet('模拟币用完了。领取可用奖励后再来一局。');return;}
-    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/pikachu-volleyball/?v=p2-fix-1';frame.title='皮卡丘排球 — Godot 街机演示';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
-    $('game-status').textContent='选择单人或双人模式时投 1 枚模拟币。';$('cabinet-dialog').showModal();window.NanoTouch?.enter();render();
+    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/'+game.path;frame.title=game.name+' — NanoFun 街机';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
+    $('cabinet-dialog').dataset.game=selectedGame; $('cabinet-title').textContent=game.name; $('cabinet-hint').textContent=game.hint; $('game-status').textContent='点击游戏内开始按钮投 1 枚模拟币。';$('cabinet-dialog').showModal();window.NanoTouch?.enter();render();
   }
-  $('play-button').addEventListener('click',openCabinet);
+  $('play-button').addEventListener('click',()=>openCabinet('volleyball'));
+  $('play-2048').addEventListener('click',()=>openCabinet('2048'));
+  $('play-snake').addEventListener('click',()=>openCabinet('snake'));
   $('exit-game').addEventListener('click',()=>$('cabinet-dialog').close());
   $('cabinet-dialog').addEventListener('close',()=>{window.NanoTouch?.reset();$('game-frame-host').replaceChildren();$('game-status').textContent='选择模式后投币开赛。';});
   // Synchronous same-origin bridge for this local demo, not a production security boundary.
   window.NanoArcade=Object.freeze({requestMatch(single=true){
     if(!$('cabinet-dialog').open||!account()){openWallet('请先进入演示身份。');return false;}
-    if(window.NanoOrientation && !window.NanoOrientation.prepare(single))return false;
-    if(!transaction(-1,'排球开赛',a=>a.coins>=1)){openWallet(storageOK?'币用完啦，模拟领取奖励后再开赛。':'当前无法保存余额，暂时不能开赛。');return false;}
-    $('game-status').textContent='已投 1 枚模拟币，本场可玩到 15 分。重开将再扣 1 币。';toast('已投币 −1 · 祝你玩得开心！');return true;
+    if(selectedGame==='volleyball' && window.NanoOrientation && !window.NanoOrientation.prepare(single))return false;
+    if(!transaction(-1,games[selectedGame].name+'开赛',a=>a.coins>=1)){openWallet(storageOK?'币用完啦，模拟领取奖励后再开赛。':'当前无法保存余额，暂时不能开赛。');return false;}
+    $('game-status').textContent='已投 1 枚模拟币，'+games[selectedGame].paid+'重开另扣 1 币。';toast('已投币 −1 · 祝你玩得开心！');return true;
   }});
   window.addEventListener('storage',event=>{if(event.key===STORAGE)render();});
   active=readStore().active||null;render();
