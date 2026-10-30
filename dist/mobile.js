@@ -31,9 +31,9 @@
     }
   }
   window.NanoTouch=Object.freeze({
-    poll(){let bits=edges;for(const bit of pointers.values())if(bit!==16&&bit!==512)bits|=bit;bits|=command<<10;edges=0;command=0;return bits;},
-    mode(single){release();host.dataset.mode=single?'single':'double';document.getElementById('touch-help').textContent=single?'左右推摇杆移动 · 向上推跳跃 · 右手扣杀 / 扑救':'P1 / P2 各有摇杆和扣杀键；同屏双人建议使用平板。';},
-    pause(){release();command=4;},reset(){release();command=0;},
+    poll(){let bits=edges;for(const bit of pointers.values())if(bit!==16&&bit!==512)bits|=bit;const orientationCommand=window.NanoOrientation?.poll()||0;bits|=(orientationCommand||command)<<10;edges=0;command=0;return bits;},
+    mode(single){window.NanoOrientation?.started(single);release();host.dataset.mode=single?'single':'double';document.getElementById('touch-help').textContent=single?'左右推摇杆移动 · 向上推跳跃 · 右手扣杀 / 扑救':'P1 / P2 各有摇杆和扣杀键；同屏双人建议使用平板。';},
+    menu(){release();command=2;},pause(){release();command=4;},reset(){release();command=0;},
     enter(){
       const meta=document.querySelector('meta[name="viewport"]');oldViewport=meta.getAttribute('content');
       meta.setAttribute('content','width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover');

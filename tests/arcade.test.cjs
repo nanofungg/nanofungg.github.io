@@ -21,6 +21,8 @@ test('Daily grant, per-match charge, zero balance, simulated reward and persiste
  h.click('daily-button');assert.equal(h.balance(),10,'daily reward cannot repeat');
  h.click('reward-button');assert.equal(h.balance(),10,'ad reward unavailable before empty');
  h.click('play-button');assert.equal(h.balance(),10,'opening cabinet is free');
+ h.window.NanoOrientation={prepare:()=>false};assert.equal(h.window.NanoArcade.requestMatch(false),false);assert.equal(h.balance(),10,'waiting for landscape never charges');
+ delete h.window.NanoOrientation;
  for(let i=0;i<10;i++)assert.equal(h.window.NanoArcade.requestMatch(),true);
  assert.equal(h.balance(),0);assert.equal(h.window.NanoArcade.requestMatch(),false);assert.equal(h.balance(),0);
  h.click('reward-button');assert.equal(h.balance(),10);

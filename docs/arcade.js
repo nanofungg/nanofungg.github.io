@@ -72,15 +72,16 @@
   function openCabinet() {
     if(!account()){openWallet('先建立演示身份，领取每日 10 币。然后进入机台。');return;}
     if(account().coins<1){openWallet('模拟币用完了。领取可用奖励后再来一局。');return;}
-    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/pikachu-volleyball/?v=stick-1';frame.title='皮卡丘排球 — Godot 街机演示';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
+    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/pikachu-volleyball/?v=dual-1';frame.title='皮卡丘排球 — Godot 街机演示';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
     $('game-status').textContent='选择单人或双人模式时投 1 枚模拟币。';$('cabinet-dialog').showModal();window.NanoTouch?.enter();render();
   }
   $('play-button').addEventListener('click',openCabinet);
   $('exit-game').addEventListener('click',()=>$('cabinet-dialog').close());
   $('cabinet-dialog').addEventListener('close',()=>{window.NanoTouch?.reset();$('game-frame-host').replaceChildren();$('game-status').textContent='选择模式后投币开赛。';});
   // Synchronous same-origin bridge for this local demo, not a production security boundary.
-  window.NanoArcade=Object.freeze({requestMatch(){
+  window.NanoArcade=Object.freeze({requestMatch(single=true){
     if(!$('cabinet-dialog').open||!account()){openWallet('请先进入演示身份。');return false;}
+    if(window.NanoOrientation && !window.NanoOrientation.prepare(single))return false;
     if(!transaction(-1,'排球开赛',a=>a.coins>=1)){openWallet(storageOK?'币用完啦，模拟领取奖励后再开赛。':'当前无法保存余额，暂时不能开赛。');return false;}
     $('game-status').textContent='已投 1 枚模拟币，本场可玩到 15 分。重开将再扣 1 币。';toast('已投币 −1 · 祝你玩得开心！');return true;
   }});
