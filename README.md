@@ -1,6 +1,6 @@
 # NanoFun Arcade
 
-GitHub Pages serves `docs/` at https://nanofungg.github.io/. The owned domain nanofungames.com is not connected yet.
+GitHub Pages serves `docs/` at https://nanofungames.com/ with enforced HTTPS. The www subdomain and the original nanofungg.github.io address redirect to this canonical domain. Keep docs/CNAME and dist/CNAME when publishing.
 
 ## Development
 Edit the homepage files in `dist/`, copy them to `docs/`, then run `node preview.mjs` for a localhost preview. Run `node --test tests/*.test.cjs` from this directory.
