@@ -64,7 +64,7 @@
   function openCabinet() {
     if(!account()){openWallet('先建立演示身份，领取每日 10 币。然后进入机台。');return;}
     if(account().coins<1){openWallet('模拟币用完了。领取可用奖励后再来一局。');return;}
-    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/pikachu-volleyball/?v=arcade-1';frame.title='皮卡丘排球 — Godot 街机演示';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
+    if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/pikachu-volleyball/?v=arcade-2';frame.title='皮卡丘排球 — Godot 街机演示';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
     $('game-status').textContent='选择单人或双人模式时投 1 枚模拟币。';$('cabinet-dialog').showModal();render();
   }
   $('play-button').addEventListener('click',openCabinet);
