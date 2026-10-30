@@ -4,3 +4,5 @@
 @media(prefers-reduced-motion:reduce){.tile{transition:none}.tile.pop{animation:none}}
 
 #sound-toggle{min-width:58px;padding:6px;font-size:10px;align-self:center;min-height:36px}#sound-toggle[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}@media(orientation:portrait){h1 span{display:none}.scores{gap:5px}.scores>div{min-width:49px;padding:7px}.scores b{font-size:20px}header small{font-size:7px;letter-spacing:.5px}}
+
+.audio-controls{display:flex;flex-direction:column;gap:4px;align-self:center}.audio-controls button,.audio-controls #sound-toggle{min-height:28px;padding:4px 7px;font-size:10px}.audio-controls button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}@media(orientation:landscape) and (max-height:480px){.audio-controls{flex-direction:row}.audio-controls button{min-height:32px}}

@@ -2,7 +2,13 @@
 (() => {
   const $ = id => document.getElementById(id);
   const STORAGE = 'nanofun.arcade.demo.v1';
-  const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=audio1',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=sound1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=sound1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
+  const GUEST = 'nanofun.arcade.guest.v1';
+  let guest=5;
+  try{const saved=sessionStorage.getItem(GUEST);if(saved!==null){const value=JSON.parse(saved);guest=Number.isInteger(value.coins)&&value.coins>=0&&value.coins<=5?value.coins:0;}else sessionStorage.setItem(GUEST,JSON.stringify({coins:5}));}catch{}
+  function guestCoins(){return guest;}
+  function balance(){return guestCoins()+(account()?.coins||0);}
+  function spendCoin(reason){if(guest>0){const next=guest-1;try{sessionStorage.setItem(GUEST,JSON.stringify({coins:next}));}catch{}guest=next;render();return true;}return transaction(-1,reason,a=>a.coins>=1);}
+  const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=audio1',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=sound1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=music1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
   let selectedGame = 'volleyball';
   let active = null, toastTimer, storageOK = true;
   function readStore() {
@@ -31,16 +37,17 @@
     else $('wallet-message').textContent='今天已经领取过了，明天再来。';
   }
   function render() {
-    const a=account(),balance=a?a.coins:0;
-    ['header-balance','cabinet-coins','wallet-balance'].forEach(id=>$(id).textContent=balance);
+    const a=account(),total=balance();
+    ['header-balance','cabinet-coins','wallet-balance'].forEach(id=>$(id).textContent=total);
     $('email-form').hidden=!!a; $('account-panel').hidden=!a;
-    $('wallet-play').hidden=!a || balance<1;
+    $('wallet-play').hidden=total<1;
+    $('guest-status').textContent=guest>0?'本会话还剩 '+guest+' 枚游客币，直接选游戏就能玩。':'游客币已用完。填写邮箱，每天领取 10 枚模拟币。';
     if(!a) return;
     $('account-label').textContent=a.label+' · 演示身份';
     $('daily-button').disabled=a.day===today();
     $('daily-button').textContent=a.day===today()?'今日已领取 · 明天再来':'领取今日 10 模拟币';
-    $('reward-button').disabled=a.coins!==0;
-    $('reward-status').textContent=a.coins===0?'点上方按钮直接模拟广告完成奖励，不会播放广告。':'模拟币用完后开放此奖励。真实激励广告尚未接入。';
+    $('reward-button').disabled=total!==0;
+    $('reward-status').textContent=total===0?'点上方按钮直接模拟广告完成奖励，不会播放广告。':'模拟币用完后开放此奖励。真实激励广告尚未接入。';
     $('ledger').replaceChildren(...a.log.map(item=>{const li=document.createElement('li'),label=document.createElement('span'),value=document.createElement('b');label.textContent=item.reason;value.textContent=(item.amount>0?'+':'')+item.amount;li.append(label,value);return li;}));
   }
   $('email-form').addEventListener('submit',async event=>{
@@ -58,7 +65,7 @@
   });
   $('switch-account').addEventListener('click',()=>{const store=readStore();delete store.active;if(!writeStore(store))return;active=null;render();$('wallet-message').textContent='切换本机演示身份；原身份余额仍保留。';});
   $('daily-button').addEventListener('click',dailyClaim);
-  $('reward-button').addEventListener('click',()=>{if(transaction(10,'模拟广告奖励',a=>a.coins===0)){$('wallet-message').textContent='模拟奖励已到账：＋10 币。本次未播放真实广告。';toast('模拟奖励 ＋10 币 · 无真实广告');}});
+  $('reward-button').addEventListener('click',()=>{if(transaction(10,'模拟广告奖励',a=>a.coins===0&&guest===0)){$('wallet-message').textContent='模拟奖励已到账：＋10 币。本次未播放真实广告。';toast('模拟奖励 ＋10 币 · 无真实广告');}});
   $('wallet-button').addEventListener('click',()=>openWallet());
   $('claim-entry').addEventListener('click',()=>{openWallet();if(account())dailyClaim();});
   ['how-button','privacy-button'].forEach(id=>$(id).addEventListener('click',()=>$('info-dialog').showModal()));
@@ -74,8 +81,6 @@
   function openCabinet(gameId = 'volleyball') {
     selectedGame = games[gameId] ? gameId : 'volleyball';
     const game=games[selectedGame];
-    if(!account()){openWallet('先建立演示身份，领取每日 10 币。然后进入机台。');return;}
-    if(account().coins<1){openWallet('模拟币用完了。领取可用奖励后再来一局。');return;}
     if(!$('game-frame-host').firstChild){const frame=document.createElement('iframe');frame.src='games/'+game.path;frame.title=game.name+' — NanoFun 街机';frame.allow='autoplay; fullscreen';$('game-frame-host').append(frame);}
     $('cabinet-dialog').dataset.game=selectedGame; $('cabinet-title').textContent=game.name; $('cabinet-hint').textContent=game.hint; $('game-status').textContent='点击游戏内开始按钮投 1 枚模拟币。';$('cabinet-dialog').showModal();window.NanoTouch?.enter();render();
   }
@@ -87,9 +92,9 @@
   $('cabinet-dialog').addEventListener('close',()=>{window.NanoTouch?.reset();$('game-frame-host').replaceChildren();$('game-status').textContent='选择模式后投币开赛。';});
   // Synchronous same-origin bridge for this local demo, not a production security boundary.
   window.NanoArcade=Object.freeze({requestMatch(single=true){
-    if(!$('cabinet-dialog').open||!account()){openWallet('请先进入演示身份。');return false;}
+    if(!$('cabinet-dialog').open)return false;
     if(selectedGame==='volleyball' && window.NanoOrientation && !window.NanoOrientation.prepare(single))return false;
-    if(!transaction(-1,games[selectedGame].name+'开赛',a=>a.coins>=1)){openWallet(storageOK?'币用完啦，模拟领取奖励后再开赛。':'当前无法保存余额，暂时不能开赛。');return false;}
+    if(!spendCoin(games[selectedGame].name+'开赛')){openWallet(!account()?'5 枚游客币已用完。填写邮箱领取每日 10 币，再继续玩。':storageOK?'模拟币用完啦，领取可用奖励后继续玩。':'当前无法保存余额，暂时不能开赛。');return false;}
     $('game-status').textContent='已投 1 枚模拟币，'+games[selectedGame].paid+'重开另扣 1 币。';toast('已投币 −1 · 祝你玩得开心！');return true;
   }});
   window.addEventListener('storage',event=>{if(event.key===STORAGE)render();});
