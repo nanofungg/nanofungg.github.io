@@ -37,7 +37,7 @@
     enter(){
       const meta=document.querySelector('meta[name="viewport"]');oldViewport=meta.getAttribute('content');
       meta.setAttribute('content','width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover');
-      if(cabinet.classList.contains('touch-enabled'))enterFullscreen();
+      if(matchMedia('(pointer: coarse)').matches)enterFullscreen();
     },
     fullscreen(){if(document.fullscreenElement)document.exitFullscreen?.().catch(()=>{});else enterFullscreen();}
   });
