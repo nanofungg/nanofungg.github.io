@@ -93,7 +93,7 @@ body {
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 
-	</head>
+	<script>for(const type of ["gesturestart","gesturechange","gestureend","dblclick","contextmenu"]){document.addEventListener(type,e=>e.preventDefault(),{passive:false});}document.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});</script></head>
 	<body>
 		<canvas id="canvas">
 			Your browser does not support the canvas tag.
