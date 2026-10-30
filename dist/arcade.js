@@ -32,6 +32,7 @@
     const a=account(),balance=a?a.coins:0;
     ['header-balance','cabinet-coins','wallet-balance'].forEach(id=>$(id).textContent=balance);
     $('email-form').hidden=!!a; $('account-panel').hidden=!a;
+    $('wallet-play').hidden=!a || balance<1;
     if(!a) return;
     $('account-label').textContent=a.label+' · 演示身份';
     $('daily-button').disabled=a.day===today();
@@ -61,6 +62,13 @@
   ['how-button','privacy-button'].forEach(id=>$(id).addEventListener('click',()=>$('info-dialog').showModal()));
   document.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
   $('game-wallet').addEventListener('click',()=>openWallet());
+  $('wallet-play').addEventListener('click',()=>{
+    $('wallet-dialog').close();
+    if($('cabinet-dialog').open) $('cabinet-dialog').close();
+    const games=$('games');
+    games.focus({preventScroll:true});
+    games.scrollIntoView({block:'start'});
+  });
   function openCabinet() {
     if(!account()){openWallet('先建立演示身份，领取每日 10 币。然后进入机台。');return;}
     if(account().coins<1){openWallet('模拟币用完了。领取可用奖励后再来一局。');return;}
