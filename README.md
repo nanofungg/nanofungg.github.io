@@ -1,15 +1,13 @@
 # NanoFun Games
 
-Independent brand homepage for NanoFun Games. Buildless HTML, CSS and JavaScript; deployable assets live in `dist/`.
+A minimal game publishing homepage: brand, game releases, and contact links.
 
-## Preview
+## Development
 
-Run `node preview.mjs`, then open http://127.0.0.1:4173.
+Edit `dist/index.html`, then copy it to `docs/index.html` before committing. Run `node preview.mjs` for a local preview.
 
-## Content
+## Publication
 
-Edit `dist/index.html`. Games and development notes are explicitly marked as planned until actual releases exist. Contact links point to the owner's GitHub and email.
+GitHub Pages publishes `docs/` from the `main` branch at https://nanofungg.github.io/. Push commits to `origin` to deploy. The first game is clearly marked as coming soon until release details are available.
 
-## Hosting
-
-`.openai/hosting.json` identifies the private Sites deployment. The owned domain nanofungames.com requires a separate DNS connection before it serves this website.
+The `.openai/hosting.json` file records the earlier private Sites deployment; it is not the GitHub Pages configuration. The custom domain nanofungames.com is not connected yet.
